@@ -12,15 +12,52 @@ export class ProductsService {
     private readonly productsRepository: Repository<Product>,
   ) { }
 
-  async findAll(): Promise<Product[]> {
-    return this.productsRepository.find();
+  async findAll(query): Promise<Product[]> {
+
+    const qb = await this.productsRepository
+      .createQueryBuilder('products')
+
+    if ('title' in query) {
+      qb.andWhere("products.title LIKE :title", { title: `%${query.title}%` });
+    }
+
+    if ('description' in query) {
+      qb.andWhere("products.description LIKE :description", { description: `%${query.description}%` });
+    }
+
+    if ('cost' in query) {
+      qb.andWhere("products.cost = :cost", { cost: `${query.cost}` })
+    }
+
+    // if('sort=id' in query){
+    //   qb.orderBy('products.id');
+    // }
+    // if('sort=title' in query){
+    //   qb.orderBy('products.title');
+    // }
+    if ('sort' in query) {
+      if (query.sort == 'id')
+        qb.orderBy('products.cost')
+      else
+        if (query.sort == 'title')
+          qb.orderBy('products.title')
+        else
+          if (query.sort == 'description')
+            qb.orderBy('products.description')
+          else
+            if (query.sort == 'cost')
+              qb.orderBy('products.cost')
+    }
+
+    const product = await qb.getMany();
+    return product;
   }
 
   findOne(id: number) {
     return this.productsRepository.findOneBy({ id: id });
   }
 
-  create(createProductDto: CreateProductDto): Promise<Product>{
+  create(createProductDto: CreateProductDto): Promise<Product> {
     const product = new Product();
     product.title = createProductDto.title;
     product.cost = createProductDto.cost;
@@ -33,6 +70,6 @@ export class ProductsService {
   }
 
   update(id: number, updateProductDto: UpdateProductDto) {
-    return this.productsRepository.update(id,updateProductDto);
+    return this.productsRepository.update(id, updateProductDto);
   }
 }

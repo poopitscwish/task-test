@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Query } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ArticlesService } from './articles.service';
 import { CreateArticleDto } from './dto/create-article.dto';
@@ -13,8 +13,8 @@ export class ArticlesController {
     //@ApiParam({ name: "noteId", required: true, description: "Note identifier" })
     @ApiResponse({ status: HttpStatus.OK, description: "Success", type: Article })
     @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: "Bad Request" })
-    findAll() {
-        return this.articlesService.findAll();
+    async findAll(@Query() query):Promise<Article[]> {
+        return await this.articlesService.findAll(query);
     }
     @Get(':id')
     @ApiOperation({ summary: "Получение статьи по id" })

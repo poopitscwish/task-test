@@ -1,5 +1,6 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Query } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { query } from 'express';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
@@ -13,8 +14,8 @@ export class ProductsController {
     //@ApiParam({ name: "noteId", required: true, description: "Note identifier" })
     @ApiResponse({ status: HttpStatus.OK, description: "Success", type: Product })
     @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: "Bad Request" })
-    findAll() {
-        return this.productsService.findAll();
+    async findAll(@Query() query):Promise<Product[]> {
+        return await this.productsService.findAll(query);
     }
     @Get(':id')
     @ApiOperation({ summary: "Получение продукта по id" })
